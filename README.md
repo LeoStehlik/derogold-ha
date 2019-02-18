@@ -13,7 +13,7 @@ The sample **service.js** includes how to automatically restart the daemon if it
 5. [Documentation](#documentation)
    1. [Methods](#methods)
    2. [Events](#events)
-   3. [TurtleCoind RPC API Interface](#turtlecoind-rpc-api-interface)
+   3. [DeroGoldd RPC API Interface](#turtlecoind-rpc-api-interface)
    4. [WebSocket Connections](#websocket-connections)
 
 ## To Do
@@ -72,7 +72,7 @@ var daemon = new DeroGoldd({
   webSocketPassword: false, // Set this to a password to use for the privileged socket events.
 
   // These are the standard Derogoldd options
-  path: './DeroGoldd', // Where can I find TurtleCoind?
+  path: './DeroGoldd', // Where can I find DeroGoldd?
   dataDir: '~/.DeroGold', // Where do you store your blockchain?
   testnet: false, // Use the testnet?
   enableCors: false, // Enable CORS support for the domain in this value
@@ -219,7 +219,7 @@ daemon.on('data', (data) => {
 
 ### Event - *desync*
 
-This event is emitted when the daemon has lost synchronization with the TurtleCoin network
+This event is emitted when the daemon has lost synchronization with the DeroGold network
 
 ```javascript
 daemon.on('descync', (daemonHeight, networkHeight, deviance) => {
