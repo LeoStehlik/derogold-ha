@@ -1,10 +1,6 @@
-[![NPM](https://nodei.co/npm/turtlecoind-ha.png?downloads=true&stars=true)](https://nodei.co/npm/turtlecoind-ha/)
+# DeroGoldd High-Availability Daemon Wrapper
 
-[![Build Status](https://travis-ci.org/brandonlehmann/turtlecoind-ha.png?branch=master)](https://travis-ci.org/brandonlehmann/turtlecoind-ha) [![Build Status](https://ci.appveyor.com/api/projects/status/github/brandonlehmann/turtlecoind-ha?branch=master&svg=true)](https://ci.appveyor.com/project/brandonlehmann/turtlecoind-ha/branch/master)
-
-# TurtleCoind High-Availability Daemon Wrapper
-
-This project is designed to wrap the TurtleCoind daemon on a *nix system and monitor it for hangups, locks, fork, or other events that cause the daemon to stop responding to requests in an accurate manner.
+This project is designed to wrap the DeroGold daemon on a *nix system and monitor it for hangups, locks, fork, or other events that cause the daemon to stop responding to requests in an accurate manner.
 
 The sample **service.js** includes how to automatically restart the daemon if it hangs, locks, or otherwise stops responding.
 
@@ -27,24 +23,24 @@ N/A
 ## Dependencies
 
 * [NodeJS v8.x](https://nodejs.org/)
-* [TurtleCoind](https://github.com/turtlecoin/turtlecoin/releases) v0.8.4 or higher
+* [DeroGoldd](https://github.com/derogold/derogold/releases) v0.0.5 or higher
 
 ## Easy Start
 
-You *must* copy ```TurtleCoind``` into the ```turtlecoind-ha``` folder for the easy start process to occur.
+You *must* copy ```DeroGoldd``` into the ```derogold-ha``` folder for the easy start process to occur.
 
 ```bash
-git clone https://github.com/turtlecoin/turtlecoind-ha.git
-cd turtlecoind-ha
-cp <TurtleCoind> .
+git clone https://github.com/LeoStehlik/derogold-ha.git
+cd derogold-ha
+cp <DeroGoldd> .
 sudo npm install & node service.js
 ```
 
-**It is highly recommended that you use [checkpoints](https://github.com/turtlecoin/turtlecoin/wiki/Using-checkpoints) when starting fresh or you'll need to wait a while for the sync to occur.**
+**It is highly recommended that you use [checkpoints](https://github.com/derogold/checkpoints) when starting fresh or you'll need to wait a while for the sync to occur.**
 
 ## Keep it Running
 
-I'm a big fan of PM2 so if you don't have it installed, the setup is quite simple.
+As a best-practice, we recommend you to run PM2 to keep the daemon running. If you don't have it installed, the setup is quite simple.
 
 ```bash
 npm install -g pm2
@@ -52,7 +48,7 @@ npm install -g pm2
 pm2 startup
 pm2 install pm2-logrotate
 
-pm2 start service.js --name turtlecoind
+pm2 start service.js --name derogoldd
 pm2 save
 ```
 
@@ -60,11 +56,11 @@ pm2 save
 
 ### Initialization
 
-Practically all TurtleCoind command line arguments are exposed in the constructor method. Simply include them in your list of options to get activate or use them. Default values are defined below.
+Practically all DeroGoldd command line arguments are exposed in the constructor method. Simply include them in your list of options to get activate or use them. Default values are defined below.
 
 ```javascript
-var daemon = new TurtleCoind({
-  // These are our TurtleCoind-ha options
+var daemon = new DeroGoldd({
+  // These are our derogold-ha options
   pollingInterval: 10000, // How often to check the daemon in milliseconds
   maxPollingFailures: 3, // How many polling intervals can fail before we emit a down event?
   checkHeight: true, // Check the daemon block height against known trusted nodes
@@ -75,17 +71,17 @@ var daemon = new TurtleCoind({
   enableWebSocket: true, // Enables a socket.io websocket server on the rpcBindPort + 1
   webSocketPassword: false, // Set this to a password to use for the privileged socket events.
 
-  // These are the standard TurtleCoind options
-  path: './TurtleCoind', // Where can I find TurtleCoind?
-  dataDir: '~/.TurtleCoin', // Where do you store your blockchain?
+  // These are the standard Derogoldd options
+  path: './DeroGoldd', // Where can I find TurtleCoind?
+  dataDir: '~/.DeroGold', // Where do you store your blockchain?
   testnet: false, // Use the testnet?
   enableCors: false, // Enable CORS support for the domain in this value
-  enableBlockExplorer: true, // Enable the block explorer
+  enableBlockExplorer: false, // Enable the block explorer
   loadCheckpoints: false, // If set to a path to a file, will supply that file to the daemon if it exists.
   rpcBindIp: '0.0.0.0', // What IP to bind the RPC server to
-  rpcBindPort: 11898, // What Port to bind the RPC server to
+  rpcBindPort: 6969, // What Port to bind the RPC server to
   p2pBindIp: '0.0.0.0', // What IP to bind the P2P network to
-  p2pBindPort: 11897, // What Port to bind the P2P network to
+  p2pBindPort: 42069, // What Port to bind the P2P network to
   p2pExternalPort: 0, // What External Port to bind the P2P network to for those behind NAT
   allowLocalIp: false, // Add our own IP to the peer list?
   peers: false, // Manually add the peer(s) to the list. Allows for a string or an Array of strings.
@@ -263,7 +259,7 @@ daemon.on('info', (info) => {
 
 ### Event - *ready*
 
-This event is emitted when the daemon is synchronized with the TurtleCoin network and is passing all the checks we have for it. It returns the equivalent of a */getinfo* call to the RPC server with a few minor additions.
+This event is emitted when the daemon is synchronized with the DeroGold network and is passing all the checks we have for it. It returns the equivalent of a */getinfo* call to the RPC server with a few minor additions.
 
 ```javascript
 daemon.on('ready', (info) => {
@@ -295,7 +291,7 @@ daemon.on('ready', (info) => {
 
 ### Event - *start*
 
-This event is emitted when the daemon starts. The callback contains the command line arguments supplied to TurtleCoind.
+This event is emitted when the daemon starts. The callback contains the command line arguments supplied to DeroGoldd.
 
 ```javascript
 daemon.on('start', (executablePath, args) => {
@@ -325,7 +321,7 @@ daemon.on('stopped', () => {
 
 ### Event - *synced*
 
-This event is emitted when the daemon has synchronized with the TurtleCoin network.
+This event is emitted when the daemon has synchronized with the DeroGold network.
 
 ```javascript
 daemon.on('synced', () => {
@@ -352,9 +348,9 @@ daemon.on('topblock', (height) => {
   // do something
 })
 ```
-## TurtleCoind RPC API Interface
+## DeroGoldd RPC API Interface
 
-As we can actually run this wrapper inside another nodeJS project, we expose all of the TurtleCoind RPC API commands via the ```daemon.api``` property. Each of the below methods are [Javascript Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises). For safety sake, **always** handle your promise catches as we do use them properly.
+As we can actually run this wrapper inside another nodeJS project, we expose all of the DeroGoldd RPC API commands via the ```daemon.api``` property. Each of the below methods are [Javascript Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises). For safety sake, **always** handle your promise catches as we do use them properly.
 
 Methods noted having options have parameters that may be *optional* or *required* as documented.
 
@@ -930,5 +926,6 @@ All responses except for ***auth*** return data in the same format.
 ## License
 
 Copyright (c) 2018, Brandon Lehmann, The TurtleCoin Developers
+Copyright (c) 2019, Leo Stehlik, adapted Brandon Lehmann's code for DeroGold
 
 Please see the included LICENSE file for more information.
