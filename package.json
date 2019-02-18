@@ -1,17 +1,17 @@
 {
-  "name": "turtlecoind-ha",
-  "version": "0.12.1",
-  "description": "Wraps the Turtlecoind Daemon and helps keep the daemon synchronized and ready for connections.",
+  "name": "derogoldd-ha",
+  "version": "0.1.1",
+  "description": "Wraps the DeroGoldd Daemon and helps keep the daemon synchronized and ready for connections.",
   "main": "index.js",
   "scripts": {
     "postinstall": "node checkpoints.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/brandonlehmann/turtlecoind-ha.git"
+    "url": "git+https://github.com/LeoStehlik/DeroGoldd-ha.git"
   },
   "keywords": [
-    "TurtleCoin",
+    "DeroGold",
     "wrapper",
     "high-availability",
     "API",
@@ -26,7 +26,7 @@
     "sha256": "^0.2.0",
     "shelljs": "^0.8.3",
     "socket.io": "^2.2.0",
-    "turtlecoin-rpc": "^0.12.2"
+    "derogold-rpc": "^0.1.1"
   },
   "devDependencies": {
     "standard": "^11.0.1"

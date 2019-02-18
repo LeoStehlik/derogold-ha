@@ -1,10 +1,11 @@
 // Copyright (c) 2018, Brandon Lehmann, The TurtleCoin Developers
+// Copyright (c) 2019, Leos Stehlik, adapted for use with DeroGold
 //
 // Please see the included LICENSE file for more information.
 
 'use strict'
 
-const TurtleCoindRPC = require('turtlecoin-rpc').TurtleCoind
+const DeroGoldRPC = require('derogold-rpc').DeroGoldd
 const WebSocket = require('./lib/websocket.js')
 const pty = require('node-pty')
 const util = require('util')
@@ -23,9 +24,9 @@ const daemonResponses = {
 }
 const blockTargetTime = 30
 
-const TurtleCoind = function (opts) {
+const DeroGoldd = function (opts) {
   opts = opts || {}
-  if (!(this instanceof TurtleCoind)) return new TurtleCoind(opts)
+  if (!(this instanceof DeroGoldd)) return new DeroGoldd(opts)
 
   /*
     This is NOT where you set your options at. If you're changing
@@ -42,17 +43,17 @@ const TurtleCoind = function (opts) {
   this.enableWebSocket = opts.enableWebSocket || true
   this.webSocketPassword = opts.webSocketPassword || false
 
-  // Begin TurtleCoind options
-  this.path = opts.path || path.resolve(__dirname, './TurtleCoind' + ((os.platform() === 'win32') ? '.exe' : ''))
-  this.dataDir = opts.dataDir || path.resolve(os.homedir(), './.TurtleCoin')
-  this.logFile = opts.logFile || path.resolve(__dirname, './TurtleCoind.log')
+  // Begin DeroGoldd options
+  this.path = opts.path || path.resolve(__dirname, './DeroGoldd' + ((os.platform() === 'win32') ? '.exe' : ''))
+  this.dataDir = opts.dataDir || path.resolve(os.homedir(), './.DeroGold')
+  this.logFile = opts.logFile || path.resolve(__dirname, './DeroGoldd.log')
   this.logLevel = opts.logLevel || 2
   this.testnet = opts.testnet || false
   this.enableCors = opts.enableCors || false
   this.enableBlockExplorer = opts.enableBlockExplorer || true
   this.loadCheckpoints = opts.loadCheckpoints || false
   this.rpcBindIp = opts.rpcBindIp || '0.0.0.0'
-  this.rpcBindPort = opts.rpcBindPort || 11898
+  this.rpcBindPort = opts.rpcBindPort || 6969
   this.p2pBindIp = opts.p2pBindIp || false
   this.p2pBindPort = opts.p2pBindPort || false
   this.p2pExternalPort = opts.p2pExternalPort || false
@@ -126,9 +127,9 @@ const TurtleCoind = function (opts) {
     }
   })
 }
-inherits(TurtleCoind, EventEmitter)
+inherits(DeroGoldd, EventEmitter)
 
-TurtleCoind.prototype.start = function () {
+DeroGoldd.prototype.start = function () {
   var databaseLockfile = path.resolve(util.format('%s/DB/LOCK', this.dataDir))
   if (fs.existsSync(databaseLockfile)) {
     this.emit('error', 'Database LOCK file exists...')
@@ -154,7 +155,7 @@ TurtleCoind.prototype.start = function () {
       return false
     }
   }
-  this.emit('info', 'Attempting to start turtlecoind-ha...')
+  this.emit('info', 'Attempting to start derogoldd-ha...')
   if (!fs.existsSync(this.path)) {
     this.emit('error', '************************************************')
     this.emit('error', util.format('%s could not be found', this.path))
@@ -222,7 +223,7 @@ TurtleCoind.prototype.start = function () {
   this.emit('start', util.format('%s%s', this.path, args.join(' ')))
 }
 
-TurtleCoind.prototype.stop = function () {
+DeroGoldd.prototype.stop = function () {
   // If we are currently running our checks, it's a good idea to stop them before we go kill the child process
   if (this.checkDaemon) {
     clearInterval(this.checkDaemon)
@@ -237,11 +238,11 @@ TurtleCoind.prototype.stop = function () {
   }, (this.timeout * 2))
 }
 
-TurtleCoind.prototype.write = function (data) {
+DeroGoldd.prototype.write = function (data) {
   this._write(util.format('%s\r', data))
 }
 
-TurtleCoind.prototype._checkChildStdio = function (data) {
+DeroGoldd.prototype._checkChildStdio = function (data) {
   if (data.indexOf(daemonResponses.started) !== -1) {
     this.emit('started')
   } else if (data.indexOf(daemonResponses.help) !== -1) {
@@ -257,7 +258,7 @@ TurtleCoind.prototype._checkChildStdio = function (data) {
   }
 }
 
-TurtleCoind.prototype._triggerDown = function () {
+DeroGoldd.prototype._triggerDown = function () {
   if (!this.firstCheckPassed) return
   if (!this.trigger) {
     this.trigger = setTimeout(() => {
@@ -266,7 +267,7 @@ TurtleCoind.prototype._triggerDown = function () {
   }
 }
 
-TurtleCoind.prototype._triggerUp = function () {
+DeroGoldd.prototype._triggerUp = function () {
   if (!this.firstCheckPassed) this.firstCheckPassed = true
   if (this.trigger) {
     clearTimeout(this.trigger)
@@ -274,7 +275,7 @@ TurtleCoind.prototype._triggerUp = function () {
   }
 }
 
-TurtleCoind.prototype._checkServices = function () {
+DeroGoldd.prototype._checkServices = function () {
   if (!this.synced) {
     this.synced = true
     this.checkDaemon = setInterval(() => {
@@ -306,7 +307,7 @@ TurtleCoind.prototype._checkServices = function () {
   }
 }
 
-TurtleCoind.prototype._checkRpc = function () {
+DeroGoldd.prototype._checkRpc = function () {
   return new Promise((resolve, reject) => {
     Promise.all([
       this.api.getInfo(),
@@ -323,7 +324,7 @@ TurtleCoind.prototype._checkRpc = function () {
   })
 }
 
-TurtleCoind.prototype._checkDaemon = function () {
+DeroGoldd.prototype._checkDaemon = function () {
   return new Promise((resolve, reject) => {
     this.help = false
     this.write('help')
@@ -334,11 +335,11 @@ TurtleCoind.prototype._checkDaemon = function () {
   })
 }
 
-TurtleCoind.prototype._write = function (data) {
+DeroGoldd.prototype._write = function (data) {
   this.child.write(data)
 }
 
-TurtleCoind.prototype._buildargs = function () {
+DeroGoldd.prototype._buildargs = function () {
   var args = ''
   if (this.dataDir) args = util.format('%s --data-dir %s', args, this.dataDir)
   if (this.logFile) args = util.format('%s --log-file %s', args, this.logFile)
@@ -389,15 +390,15 @@ TurtleCoind.prototype._buildargs = function () {
   return args.split(' ')
 }
 
-TurtleCoind.prototype._setupAPI = function () {
-  this.api = new TurtleCoindRPC({
+ DeroGoldd.prototype._setupAPI = function () {
+  this.api = new DeroGoldRPC({
     host: this.rpcBindIp,
     port: this.rpcBindPort,
     timeout: this.timeout
   })
-}
+ }
 
-TurtleCoind.prototype._setupWebSocket = function () {
+DeroGoldd.prototype._setupWebSocket = function () {
   if (this.enableWebSocket) {
     this.webSocket = new WebSocket({
       port: (this.rpcBindPort + 1),
@@ -495,7 +496,7 @@ TurtleCoind.prototype._setupWebSocket = function () {
   }
 }
 
-TurtleCoind.prototype._registerWebSocketClientEvents = function (socket) {
+DeroGoldd.prototype._registerWebSocketClientEvents = function (socket) {
   var that = this
   var events = Object.getPrototypeOf(this.api)
   events = Object.getOwnPropertyNames(events).filter((f) => {
@@ -536,4 +537,4 @@ function precisionRound (number, precision) {
   return Math.round(number * factor) / factor
 }
 
-module.exports = TurtleCoind
+module.exports = DeroGoldd
