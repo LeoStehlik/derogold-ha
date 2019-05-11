@@ -38,6 +38,25 @@ sudo npm install & node service.js
 
 **It is highly recommended that you use [checkpoints](https://github.com/derogold/checkpoints) when starting fresh or you'll need to wait a while for the sync to occur.**
 
+In some of the fresh installed ARMBIAN aarch64 systems, some of the dependencies got missing, such as: request-promise-native. You can fix it by manually installing:
+
+```bash
+npm install --save request
+npm install --save request-promise-native
+```
+
+Additionally, you may encounter the following error: 
+
+```bash
+Error: The module '/root/derogold-ha/node_modules/node-pty/build/Release/pty.node'
+was compiled against a different Node.js version using
+NODE_MODULE_VERSION 57. This version of Node.js requires
+NODE_MODULE_VERSION 64. Please try re-compiling or re-installing
+the module (for instance, using `npm rebuild` or `npm install`).
+```
+
+Usually running npm rebuild fixes it. 
+
 ## Keep it Running
 
 As a best-practice, we recommend you to run PM2 to keep the daemon running. If you don't have it installed, the setup is quite simple.
